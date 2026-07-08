@@ -1,0 +1,251 @@
+/* ═══════════════════════════════════════════════════════════════
+   ARCHIVE.99 — base, CRT effects, landing, boot, shutdown
+   Palette (Pantone TCX):
+     Jet Black    #2B2B2D   19-0303
+     Nimbus Cloud #D4D4D6   13-4108
+     Cloud Dancer #F0EEE4   11-4201
+     Estate Blue  #233A5E   19-4027
+     Flame Scarlet#CD212A   18-1662
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --jet: #2B2B2D;
+  --nimbus: #D4D4D6;
+  --nimbus-hi: #ECECEE;
+  --nimbus-lo: #9C9CA0;
+  --nimbus-dk: #55555A;
+  --dancer: #F0EEE4;
+  --estate: #233A5E;
+  --estate-hi: #3A5A8C;
+  --scarlet: #CD212A;
+  --bsod-blue: #0000A8;
+  --mono: "Courier New", "Courier Prime", Courier, monospace;
+  --ui: Tahoma, "MS Sans Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --head: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--mono);
+  background: #000;
+  color: var(--jet);
+  overflow: hidden;
+  -webkit-font-smoothing: none;
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+.stage { position: fixed; inset: 0; }
+.stage[hidden] { display: none !important; }
+
+/* ── CRT overlay ─────────────────────────────────────────────── */
+
+#crt { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+body.no-crt #crt { display: none; }
+
+.crt-scanlines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0)    0px,
+    rgba(0,0,0,0)    2px,
+    rgba(0,0,0,.11)  3px,
+    rgba(0,0,0,0)    4px
+  );
+}
+
+.crt-flicker {
+  position: absolute; inset: 0;
+  background: rgba(180,190,255,.022);
+  animation: crt-flicker 4.2s infinite steps(1);
+}
+@keyframes crt-flicker {
+  0%,100% { opacity: .55; } 7% { opacity: .2; } 9% { opacity: .75; }
+  13% { opacity: .4; } 31% { opacity: .65; } 33% { opacity: .25; }
+  57% { opacity: .6; } 81% { opacity: .3; } 84% { opacity: .7; }
+}
+
+.crt-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center,
+    rgba(0,0,0,0) 58%, rgba(0,0,0,.28) 100%);
+}
+
+/* grain */
+#crt::after {
+  content: "";
+  position: absolute; inset: -100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  animation: grain 1.1s steps(4) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0,0); } 25% { transform: translate(-3%,2%); }
+  50% { transform: translate(2%,-3%); } 75% { transform: translate(-2%,-2%); }
+  100% { transform: translate(3%,3%); }
+}
+
+/* ── Stage 1 · BSOD landing ──────────────────────────────────── */
+
+#landing {
+  background: var(--bsod-blue);
+  color: #fff;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  cursor: default;
+}
+
+.bsod { width: 100%; display: flex; justify-content: center; }
+
+.bsod-inner {
+  max-width: 720px;
+  width: 100%;
+  padding: clamp(24px, 7vh, 84px) clamp(18px, 5vw, 48px) 48px;
+  font-size: clamp(13px, 1.7vmin, 16px);
+  line-height: 1.65;
+}
+
+.glow, .bsod-inner {
+  text-shadow: 0 0 6px rgba(160,180,255,.55), 0 0 1px rgba(255,255,255,.9);
+}
+
+.bsod-heading { letter-spacing: .18em; opacity: .85; margin-bottom: 1.4em; }
+
+.bsod-title {
+  font-size: clamp(20px, 3.4vmin, 30px);
+  font-weight: 700;
+  margin-bottom: 1.6em;
+}
+.bsod-title .glow { background: #fff; color: var(--bsod-blue); padding: 0 .35em; text-shadow: none; }
+
+.bsod-meta { margin-bottom: 1.4em; }
+.bsod-meta div { display: flex; gap: 1em; }
+.bsod-meta dt { min-width: 15ch; opacity: .75; letter-spacing: .08em; }
+.bsod-meta dt::after { content: ""; }
+.bsod-meta dd { font-weight: 700; }
+
+.bsod-rule { opacity: .6; margin: 1.3em 0; overflow: hidden; white-space: nowrap; }
+
+.bsod-line { margin-bottom: 1.05em; }
+
+.cursor-block { animation: blink 1.06s steps(1) infinite; margin-left: .4ch; }
+
+.bsod-enter {
+  display: block;
+  background: none; border: none; color: #fff;
+  font-size: inherit; line-height: inherit;
+  text-align: left; padding: .4em 0; margin-top: .6em;
+  text-shadow: inherit;
+}
+.bsod-enter .blink { animation: blink-slow 2.2s steps(1) infinite; }
+.bsod-enter b { background: #fff; color: var(--bsod-blue); padding: 0 .45em; text-shadow: none; }
+.bsod-enter-touch { display: none; margin-top: 1em; letter-spacing: .12em; opacity: .9; }
+
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+@keyframes blink-slow { 0%,70% { opacity: 1; } 71%,100% { opacity: .18; } }
+
+@media (pointer: coarse) {
+  .bsod-enter-touch { display: block; animation: blink-slow 2.2s steps(1) infinite; }
+}
+
+/* landing exit: screen dies */
+#landing.dying { animation: crt-off .45s ease-in forwards; }
+@keyframes crt-off {
+  0%   { transform: scaleY(1);     filter: brightness(1); }
+  60%  { transform: scaleY(.006);  filter: brightness(3); }
+  100% { transform: scaleY(.0001) scaleX(0); filter: brightness(6); opacity: 0; }
+}
+
+/* ── Stage 2 · Boot ──────────────────────────────────────────── */
+
+#boot {
+  background: #000;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+}
+#boot .boot-inner { padding: 24px; }
+
+.boot-spinner {
+  position: relative; width: 64px; height: 64px; margin: 0 auto 34px;
+  animation: spin 1.1s steps(12) infinite;
+}
+.boot-spinner span {
+  position: absolute; left: 29px; top: 2px;
+  width: 6px; height: 18px; background: #cfcfd4;
+  border-radius: 1px;
+  transform-origin: 3px 30px;
+}
+.boot-spinner span:nth-child(1)  { transform: rotate(0deg);   opacity: 1;   }
+.boot-spinner span:nth-child(2)  { transform: rotate(30deg);  opacity: .92; }
+.boot-spinner span:nth-child(3)  { transform: rotate(60deg);  opacity: .84; }
+.boot-spinner span:nth-child(4)  { transform: rotate(90deg);  opacity: .76; }
+.boot-spinner span:nth-child(5)  { transform: rotate(120deg); opacity: .68; }
+.boot-spinner span:nth-child(6)  { transform: rotate(150deg); opacity: .60; }
+.boot-spinner span:nth-child(7)  { transform: rotate(180deg); opacity: .52; }
+.boot-spinner span:nth-child(8)  { transform: rotate(210deg); opacity: .44; }
+.boot-spinner span:nth-child(9)  { transform: rotate(240deg); opacity: .36; }
+.boot-spinner span:nth-child(10) { transform: rotate(270deg); opacity: .28; }
+.boot-spinner span:nth-child(11) { transform: rotate(300deg); opacity: .20; }
+.boot-spinner span:nth-child(12) { transform: rotate(330deg); opacity: .12; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.boot-heading {
+  font-family: var(--mono);
+  font-size: clamp(14px, 2.4vmin, 20px);
+  font-weight: 700;
+  letter-spacing: .1em;
+  margin-bottom: 18px;
+  text-shadow: 0 0 8px rgba(160,180,255,.5);
+}
+
+.boot-status {
+  min-height: 1.6em;
+  font-size: clamp(12px, 1.9vmin, 15px);
+  opacity: .85;
+  margin-bottom: 26px;
+}
+
+.boot-bar {
+  width: min(340px, 70vw); height: 16px; margin: 0 auto;
+  border: 1px solid #cfcfd4; padding: 2px;
+}
+#boot-bar-fill {
+  height: 100%; width: 0%;
+  background: repeating-linear-gradient(90deg,
+    #cfcfd4 0 8px, transparent 8px 11px);
+  transition: width .45s steps(6);
+}
+
+/* ── Stage 4 · Shutdown ──────────────────────────────────────── */
+
+#shutdown {
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; text-align: center; padding: 24px;
+}
+.shutdown-text {
+  color: #ffa500;
+  font-size: clamp(18px, 3.4vmin, 30px);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255,165,0,.6);
+}
+.shutdown-sub { color: #7a7a80; font-size: clamp(11px, 1.7vmin, 14px); }
+#reboot-btn {
+  margin-top: 26px;
+  background: none; border: 1px solid #555; color: #aaa;
+  padding: 8px 18px; font-size: 13px;
+}
+#reboot-btn:hover { border-color: #ffa500; color: #ffa500; }
+
+/* generic fade-in used between stages */
+.stage.fade-in { animation: stage-in .5s ease-out; }
+@keyframes stage-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-flicker, #crt::after, .cursor-block, .bsod-enter .blink { animation: none; }
+}
