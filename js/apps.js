@@ -239,7 +239,7 @@ window.A99 = window.A99 || {};
     });
   }
 
-  /* ── ABOUT ME (subject profile) ──────────────────────────────── */
+  /* ── ABOUT ME (subject profile — now shows the Canva PDF) ─────── */
 
   function openAbout() {
     openWindow({
@@ -250,76 +250,13 @@ window.A99 = window.A99 || {};
       statusLeft: "SUBJECT PROFILE",
       statusRight: PROFILE.fileNo,
       render(body) {
-        const mug = PROFILE.mugshot
-          ? `<img src="${esc(PROFILE.mugshot)}" alt="Subject mugshot">`
-          : "";
         body.innerHTML = `
-        <article class="profile">
-          <header class="pr-header">
-            <div class="pr-seal">ARCHIVE<br>·99·<br>UNIT</div>
-            <div>
-              <h2>CREATIVE INVESTIGATION BUREAU</h2>
-              <div class="sub">SUBJECT RECORD · PERSONNEL FILE</div>
-            </div>
-            <div class="pr-fileno">FILE NO.<br><b>${esc(PROFILE.fileNo)}</b></div>
-          </header>
-
-          <div class="pr-top">
-            <div class="mugshot">
-              <div class="mug-board">
-                <div class="mug-img">${mug}</div>
-                <div class="mug-plate">BHANUSHALI · J.</div>
-              </div>
-            </div>
-            <div class="pr-fields">
-              <dl>
-                <div><dt>NAME</dt><dd>${esc(PROFILE.name)}</dd></div>
-                <div><dt>ALIAS</dt><dd>${esc(PROFILE.alias)}</dd></div>
-                <div><dt>AGE</dt><dd>${esc(PROFILE.age)}</dd></div>
-                <div><dt>LOCATION</dt><dd>${esc(PROFILE.location)}</dd></div>
-                <div><dt>OCCUPATION</dt><dd>${esc(PROFILE.occupation)}</dd></div>
-              </dl>
-              <div class="pr-section">
-                <h3>DOCUMENTED SKILLS</h3>
-                <div class="pr-skills">
-                  ${PROFILE.skills.map((s) => `<span>${esc(s)}</span>`).join("")}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <section class="pr-section">
-            <h3>SUBJECT STATEMENT</h3>
-            ${PROFILE.statement.map((p) => `<p>${phFormat(p)}</p>`).join("")}
-            <blockquote class="pr-quote">${esc(PROFILE.fontLine)}</blockquote>
-          </section>
-
-          <section class="pr-section">
-            <h3>EXPERIENCE ON RECORD</h3>
-            <ul class="pr-list">
-              ${PROFILE.experience.map((e) => `<li>
-                <div class="li-title">${phFormat(e.title)}</div>
-                <div class="li-meta">${phFormat(e.meta)}</div></li>`).join("")}
-            </ul>
-          </section>
-
-          <section class="pr-section">
-            <h3>EDUCATION ON RECORD</h3>
-            <ul class="pr-list">
-              ${PROFILE.education.map((e) => `<li>
-                <div class="li-title">${phFormat(e.title)}</div>
-                <div class="li-meta">${phFormat(e.meta)}</div></li>`).join("")}
-            </ul>
-          </section>
-
-          <section class="pr-section">
-            <h3>FINGERPRINTS</h3>
-            <div class="fingerprints">
-              ${["L-THUMB","L-INDEX","L-MIDDLE","R-THUMB","R-INDEX","R-MIDDLE"]
-                .map((f) => `<div class="fp"><span>${f}</span></div>`).join("")}
-            </div>
-          </section>
-        </article>`;
+        <div class="about-pdf-view">
+          <iframe class="about-pdf-frame"
+            src="assets/About-Me-Subject-Profile.pdf"
+            title="About Me — Subject Profile">
+          </iframe>
+        </div>`;
       },
     });
   }
