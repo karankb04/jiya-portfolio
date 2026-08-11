@@ -252,6 +252,9 @@ window.A99 = window.A99 || {};
       render(body) {
         body.innerHTML = `
         <div class="about-pdf-view">
+          <div class="resume-actions">
+            <a class="bevel-out" href="assets/About-Me-Subject-Profile.pdf" target="_blank" rel="noopener">↗ Open PDF in new tab</a>
+          </div>
           <iframe class="about-pdf-frame"
             src="assets/About-Me-Subject-Profile.pdf"
             title="About Me — Subject Profile">
